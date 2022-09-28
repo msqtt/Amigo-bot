@@ -67,11 +67,13 @@ func (msg *RecvMessage) String() string {
 		return fmt.Sprintf("来自群: %d，用户: %s，的消息: \"%s\"",
 			msg.GroupId,
 			msg.Sender.String(),
-			msg.Message)
+			msg.Message,
+		)
 	}
 	return fmt.Sprintf("来自用户: %s，内容: \"%s\"",
 		msg.Sender.String(),
-		msg.Message)
+		msg.Message,
+	)
 }
 
 type RecvRequest struct {
@@ -108,13 +110,15 @@ func (nts *RecvNotice) String() string {
 			nts.SubType,
 			nts.SenderId,
 			nts.TargetId,
-			nts.GroupId)
+			nts.GroupId,
+		)
 	}
 	return fmt.Sprintf("[消息: %s %s, 发送ID: %d，目标ID: %d]",
 		nts.NoticeType,
 		nts.SubType,
 		nts.SenderId,
-		nts.TargetId)
+		nts.TargetId,
+	)
 }
 
 type RecvMeta struct {
@@ -125,7 +129,8 @@ type RecvMeta struct {
 func (meta *RecvMeta) String() string {
 	return fmt.Sprintf("[元事件: %s, 类型: %s]",
 		meta.MetaEvenType,
-		meta.SubType)
+		meta.SubType,
+	)
 }
 
 type Asender struct {
@@ -147,7 +152,8 @@ func (sd *Asender) String() string {
 		return fmt.Sprintf("[QQ: %d, 群名片: %s, 职位: %s]",
 			sd.UserId,
 			sd.Cardname,
-			sd.Role)
+			sd.Role,
+		)
 	}
 	return fmt.Sprintf("[QQ: %d, 名称: %s]", sd.UserId, sd.Nickname)
 }

@@ -1,3 +1,6 @@
+/*
+一个非常简单的请求处理插件，拒绝除了root qq 以外的好友或群请求
+*/
 package ezres
 
 import (
@@ -5,31 +8,38 @@ import (
 	"github.com/mosqu1t0/Amigo-bot/utils/logcat"
 )
 
+/*
+插件必须实现的接口
+
+	type Plugin interface {
+	    Init()
+	    GetType() string
+	    Action(b *bot.Bot, v interface{})
+	}
+*/
 type Ezres struct {
-	postType string
 }
 
+// 必须在 init 将插件添加到 PluginMgr 中，否则插件无法被读取
+// 为了执行init, 必须在 main.go 中import 该插件包
 func init() {
 	ezres := new(Ezres)
-	ezres.postType = "request"
-	bot.PluginMgr.AddPlugin(ezres) // 将插件手动添加到mgr
-
+	bot.PluginMgr.AddPlugin(ezres)
 }
 
-// 在PluginMgr之后的初始化函数，maybe放一些信息?
+// 在 PluginMgr 之后的初始化函数，maybe 放一些信息?
 func (ezres *Ezres) Init() {
 	logcat.Good("[远离害虫]，Ezres 插件加载完成！<3")
 }
 
 // 获取插件作用的消息类型
 func (ezres *Ezres) GetType() string {
-	return ezres.postType
+	return "request"
 }
 
-// 实现插件interface, Action() 的是插件调用的主要功能
+// 实现插件的interface, Action() 放插件的主要功能
 func (ezres *Ezres) Action(b *bot.Bot, v interface{}) {
-	req, _ := v.(*bot.RecvRequest) // 断言转换为指针类型
-	// 具体逻辑
+	req, _ := v.(*bot.RecvRequest) // 记得断言为指针类型
 	ifAgree := false
 	for _, root := range bot.DefaultBotConfig.Root {
 		if root == req.UserId {

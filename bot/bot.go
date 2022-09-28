@@ -25,7 +25,8 @@ func NewBot() *Bot {
 func (bot *Bot) Start() {
 	u := url.URL{Scheme: "ws",
 		Host: DefaultBotConfig.Ws.Addr,
-		Path: DefaultBotConfig.Ws.Path}
+		Path: DefaultBotConfig.Ws.Path,
+	}
 
 	var senWs *websocket.Conn
 	var err error
@@ -82,5 +83,6 @@ func (bot *Bot) showlogo() {
 	splitLine := "----------------------------------------\n"
 	version := ">           Amigo bot v1.0             <\n"
 	fmt.Printf("\033[1;35m%s\033[0m\n",
-		fmt.Sprint(botLogo, splitLine, version, splitLine))
+		fmt.Sprint(botLogo, splitLine, version, splitLine),
+	)
 }

@@ -37,7 +37,8 @@ func (bot *Bot) receive() {
 
 func (bot *Bot) Send(action string, v interface{}) {
 	err := bot.ws.WriteJSON(
-		SendRespondJson{Action: action, Params: v, Echo: echo})
+		SendRespondJson{Action: action, Params: v, Echo: echo},
+	)
 	if err != nil {
 		logcat.Error("发送Json失败: ", err)
 	}
