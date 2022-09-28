@@ -1,18 +1,19 @@
 package bot
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/mosqu1t0/Amigo-bot/utils/logcat"
 )
 
 type Bot struct {
-	ws          *websocket.Conn
-	hasBoot     bool
-	plugManager *PluginManager
+	ws      *websocket.Conn
+	hasBoot bool
 }
 
 var upgrader = websocket.Upgrader{}
@@ -26,16 +27,25 @@ func (bot *Bot) Start() {
 		Host: DefaultBotConfig.Ws.Addr,
 		Path: DefaultBotConfig.Ws.Path}
 
-	logcat.Info("尝试连接到服务器: ", u.String())
-	senWs, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		logcat.ErrorEnd("连接服务器，失败: ", err)
+	var senWs *websocket.Conn
+	var err error
+	for {
+		logcat.Info("尝试连接到服务器: ", u.String())
+		senWs, _, err = websocket.DefaultDialer.Dial(u.String(), nil)
+		if err != nil {
+			logcat.Error("连接服务器，失败: ", err)
+			logcat.Info("bot 将于 3s 后重新连接...")
+			time.Sleep(time.Second * 3)
+		} else {
+			break
+		}
 	}
 
 	bot.ws = senWs
 	bot.hasBoot = true
 	logcat.Good("连接服务器，成功!")
-	InitPlugin(bot)
+	bot.showlogo()
+	PluginMgr.finishInit()
 }
 
 func (bot *Bot) Work() {
@@ -66,4 +76,11 @@ func (bot *Bot) Close() {
 	}
 	bot.ws.Close()
 	logcat.Good("bot 连接关闭成功!")
+}
+
+func (bot *Bot) showlogo() {
+	splitLine := "----------------------------------------\n"
+	version := ">           Amigo bot v1.0             <\n"
+	fmt.Printf("\033[1;35m%s\033[0m\n",
+		fmt.Sprint(botLogo, splitLine, version, splitLine))
 }

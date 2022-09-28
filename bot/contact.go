@@ -12,36 +12,30 @@ func (bot *Bot) receive() {
 		logcat.Error("Read bytes from ws error: ", err)
 	}
 
-	var reckind RecKind
+	var reckind RecvKind
 	json.Unmarshal(bytes, &reckind)
 
 	switch reckind.PostType {
 	case MsgPostType:
-		msg := new(RecMessage)
+		msg := new(RecvMessage)
 		json.Unmarshal(bytes, msg)
 		bot.handleMessage(msg)
 	case ReqPostType:
-		req := new(RecRequest)
+		req := new(RecvRequest)
 		json.Unmarshal(bytes, req)
 		bot.handleRequest(req)
 	case NtsPostType:
-		nts := new(RecNotice)
+		nts := new(RecvNotice)
 		json.Unmarshal(bytes, nts)
 		bot.handleNotise(nts)
 	case MtaPostType:
-		mta := new(RecMeta)
+		mta := new(RecvMeta)
 		json.Unmarshal(bytes, mta)
 		bot.handleMeta(mta)
 	}
 }
 
-func (bot *Bot) send(action string, v interface{}) {
-	str, _ := json.Marshal(SendRespondJson{
-		Action: action,
-		Params: v,
-		Echo:   echo,
-	})
-	logcat.Info("发送消息...", string(str))
+func (bot *Bot) Send(action string, v interface{}) {
 	err := bot.ws.WriteJSON(
 		SendRespondJson{Action: action, Params: v, Echo: echo})
 	if err != nil {

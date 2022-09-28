@@ -49,11 +49,11 @@ const (
 	hertMetaType = "heartbeat"
 )
 
-type RecKind struct {
+type RecvKind struct {
 	PostType string `json:"post_type"`
 }
 
-type RecMessage struct {
+type RecvMessage struct {
 	Sender      Asender `json:"sender"`
 	SubType     string  `json:"sub_type"`
 	TempSource  string  `json:"temp_source"`
@@ -62,7 +62,7 @@ type RecMessage struct {
 	Message     string  `json:"message"`
 }
 
-func (msg *RecMessage) String() string {
+func (msg *RecvMessage) String() string {
 	if msg.MessageType == GruMsgType {
 		return fmt.Sprintf("来自群: %d，用户: %s，的消息: \"%s\"",
 			msg.GroupId,
@@ -74,7 +74,7 @@ func (msg *RecMessage) String() string {
 		msg.Message)
 }
 
-type RecRequest struct {
+type RecvRequest struct {
 	RequestType string `json:"request_type"`
 	GroupId     int64  `json:"group_id"`
 	UserId      int64  `json:"user_id"`
@@ -82,7 +82,7 @@ type RecRequest struct {
 	SubType     string `json:"sub_type"`
 }
 
-func (req *RecRequest) String() string {
+func (req *RecvRequest) String() string {
 	switch req.RequestType {
 	case FriRequestType:
 		return fmt.Sprintf("[好友邀请: %d]", req.UserId)
@@ -93,7 +93,7 @@ func (req *RecRequest) String() string {
 	}
 }
 
-type RecNotice struct {
+type RecvNotice struct {
 	NoticeType string `json:"notice_type"`
 	SubType    string `json:"sub_type"`
 	SenderId   int64  `json:"sender_id"`
@@ -101,7 +101,7 @@ type RecNotice struct {
 	GroupId    int64  `json:"group_id"`
 }
 
-func (nts *RecNotice) String() string {
+func (nts *RecvNotice) String() string {
 	if nts.GroupId != 0 {
 		return fmt.Sprintf("[消息: %s %s, 发送ID: %d，目标ID: %d, 群: %d]",
 			nts.NoticeType,
@@ -117,12 +117,12 @@ func (nts *RecNotice) String() string {
 		nts.TargetId)
 }
 
-type RecMeta struct {
+type RecvMeta struct {
 	MetaEvenType string `json:"meta_event_type"`
 	SubType      string `json:"sub_type"`
 }
 
-func (meta *RecMeta) String() string {
+func (meta *RecvMeta) String() string {
 	return fmt.Sprintf("[元事件: %s, 类型: %s]",
 		meta.MetaEvenType,
 		meta.SubType)
@@ -175,3 +175,24 @@ type SendRespondJson struct {
 	Params interface{} `json:"params"`
 	Echo   string      `json:"echo"`
 }
+
+var botLogo = `
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠊⠉⠀⠈⠙⢦⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣿⣀⠀⠀⠀⠀⠀⠀⠀⠀⡰⠋⡠⠖⠋⠉⠛⢷⣶⢷⡀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠀⠘⢿⣩⣧⠀⠀⠀⠀⠀⠀⡼⣡⠎⠀⠀⠀⠀⠀⠀⠹⣍⣧⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢴⣿⡶⠀⠀⠉⠋⠀⠀⠀⠀⠀⣸⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠃⠀⠀⢀⣠⠴⠒⢛⣻⣛⣿⣧⣤⣀⡀⠀⠀⠀⠀⠀⠀⢀⣿⠃⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣴⠞⠉⠀⠐⠻⠟⠛⢛⣷⠀⠀⠀⠉⠓⢦⡀⠀⠀⠀⠈⠋⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠘⠻⢶⣞⣋⣡⠞⠁⣄⣀⣀⣀⣠⡶⠿⠛⢋⠀⠀⠀⠀⢤⡀⠈⢢⡀⠀⠀⠀⢀⣾⣧⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⢚⡿⠁⠀⣠⣾⣽⠷⢦⣤⠤⢀⣴⡟⠀⡄⣿⠀⠈⠻⡄⡄⠹⡄⠀⠀⣾⣾⠋⠀⢀⠀
+⠀⠀⠀⠀⠀⠀⣤⠞⢛⣽⡟⠓⢶⣚⣋⡙⠲⢾⣭⣴⢶⣿⡟⠀⣄⣿⠻⣧⠀⠀⢷⠸⡆⠹⡄⠀⠀⠁⠀⢴⣿⣷
+⠀⠀⠀⠀⠀⠀⠀⢀⡾⣻⠁⢠⢀⣿⣽⠿⠖⠋⠟⠀⣺⣾⣁⣶⠿⠉⠀⠸⡆⠀⣿⠀⣷⠀⢻⠀⠀⠀⠀⠀⠛⠁
+⠀⣠⣶⡄⠀⠀⢀⣾⣿⡇⠀⣼⢸⣧⣿⠀⠲⣄⠀⠒⠛⠋⠁⠀⠀⠀⢀⣠⣧⢠⣿⠀⣿⡄⢸⡆⠀⠀⠀⠀⠀⠀
+⠀⠉⠿⠁⠀⢀⡼⣯⣼⡖⢠⡇⣸⠁⠈⢠⣤⣌⠙⠀⠀⠀⠀⠀⠛⣛⣉⢀⣧⠞⣿⠀⢹⣿⣨⣧⠀⠀⠀⠀⠀⠀
+⢀⠀⢀⣠⣴⣫⣼⣿⣽⢣⣼⣷⣇⣶⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⣶⣿⣿⣾⣧⣸⡇⠀⣿⣿⢸⣷⣷⣤⣀⡀⠀⠀
+⠈⠉⠉⠉⢁⣼⣿⣿⣿⣾⣿⣿⡿⣿⣿⣿⣿⣏⠀⠀⠀⠀⠀⠀⢋⣽⣿⣿⣿⣿⡇⠀⢸⣷⢼⣟⣆⠉⠉⠁⠀⠀
+⠀⠀⠀⣴⣿⡾⢒⣿⠛⠃⣿⣏⢣⡽⣿⣻⡿⠃⠀⠀⠀⠀⠀⠀⠘⣿⡿⣿⡿⢻⠇⠀⠸⣿⡆⢿⣎⢦⠀⠀⠀⠀
+⠀⠀⣼⡿⣿⣇⣾⡏⠀⢸⣿⣿⡋⡠⣢⡆⠀⠀⠀⠀⠀⠀⠀⠀⣶⣟⣿⣿⠀⢸⣦⠀⠰⣿⣧⠈⣿⣿⣇⠀⠀⠀
+⠀⠀⢻⠀⣿⣿⣿⡇⠀⠸⣿⣿⣻⠖⠋⠀⠀⠀⠠⠖⠒⠲⣄⠀⠁⠘⡟⠏⠚⢸⣿⡀⠀⢻⣿⠀⣿⣿⠟⠀
+`

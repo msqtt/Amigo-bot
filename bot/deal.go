@@ -2,45 +2,32 @@ package bot
 
 import "github.com/mosqu1t0/Amigo-bot/utils/logcat"
 
-func (bot *Bot) handleMessage(msg *RecMessage) {
+func (bot *Bot) handleMessage(msg *RecvMessage) {
 	logcat.Info("收到了消息: ", msg.String())
+	for _, p := range PluginMgr.plugins[MsgPostType] {
+		go p.Action(bot, msg)
+	}
 }
 
-func (bot *Bot) handleRequest(req *RecRequest) {
+func (bot *Bot) handleRequest(req *RecvRequest) {
 	logcat.Info("收到了请求: ", req.String())
-
-	ifAgree := false
-	for _, root := range DefaultBotConfig.Root {
-		logcat.Print(root)
-		if root == req.UserId {
-			ifAgree = true
-			break
-		}
-	}
-	switch req.RequestType {
-	case GruRequestType:
-		bot.send(GruRequestApi, struct {
-			Flag    string `json:"flag"`
-			SubType string `json:"sub_type"`
-			Approve bool   `json:"approve"`
-			Reason  string `json:"reason"`
-		}{req.Flag, req.SubType, ifAgree, "我不跟陌生人走嗷"})
-	case FriRequestType:
-		bot.send(FriRequestApi, struct {
-			Flag    string `json:"flag"`
-			Approve bool   `json:"approve"`
-		}{req.Flag, ifAgree})
-	default:
-		logcat.Error("哈？未知的邀请格式...")
+	for _, p := range PluginMgr.plugins[ReqPostType] {
+		go p.Action(bot, req)
 	}
 }
 
-func (bot *Bot) handleNotise(nts *RecNotice) {
+func (bot *Bot) handleNotise(nts *RecvNotice) {
 	logcat.Info("收到了信息: ", nts.String())
+	for _, p := range PluginMgr.plugins[NtsPostType] {
+		go p.Action(bot, nts)
+	}
 }
 
-func (bot *Bot) handleMeta(mta *RecMeta) {
+func (bot *Bot) handleMeta(mta *RecvMeta) {
 	if mta.MetaEvenType != hertMetaType {
 		logcat.Info("收到了元信息: ", mta.String())
+	}
+	for _, p := range PluginMgr.plugins[MtaPostType] {
+		go p.Action(bot, mta)
 	}
 }

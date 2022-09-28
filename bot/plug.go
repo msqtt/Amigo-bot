@@ -1,44 +1,36 @@
 package bot
 
-import (
-	"os"
-	"plugin"
-
-	"github.com/mosqu1t0/Amigo-bot/utils/logcat"
-)
-
-const pluginsPath = "./plugins/"
+import "github.com/mosqu1t0/Amigo-bot/utils/logcat"
 
 type BotPlugin interface {
-	Action(bot *Bot, v interface{})
+	Init()
+	Action(b *Bot, v interface{})
+	GetType() string
 }
 
-type PluginManager struct {
-	plugins []BotPlugin
+type pluginManager struct {
+	plugins map[string][]BotPlugin
 }
 
-func InitPlugin(bot *Bot) {
-	bot.plugManager = new(PluginManager)
-	bot.plugManager.LoadPlugins()
+var PluginMgr *pluginManager
+
+func init() {
+	PluginMgr = new(pluginManager)
+	PluginMgr.plugins = make(map[string][]BotPlugin)
 }
 
-func (pl *PluginManager) LoadPlugins() {
-	files, err := os.ReadDir(pluginsPath)
-	if err != nil {
-		logcat.Error("无法读取文件夹，插件加载失败!")
-	}
+func (pm *pluginManager) AddPlugin(plugin BotPlugin) {
+	postType := plugin.GetType()
+	pm.plugins[postType] = append(pm.plugins[postType], plugin)
+}
 
-	for _, file := range files {
-		p, errIo := plugin.Open(pluginsPath + file.Name())
-		plugSymbot, errLo := p.Lookup("Plug")
-		if errIo != nil || errLo != nil {
-			logcat.Error("读取插件 ", file.Name(), " 发生错误...")
-			continue
+func (pm *pluginManager) finishInit() {
+	count := 0
+	for _, vp := range pm.plugins {
+		count += len(vp)
+		for _, p := range vp {
+			p.Init()
 		}
-		plugin, ok := plugSymbot.(BotPlugin)
-		if ok {
-			pl.plugins = append(pl.plugins, plugin)
-		}
 	}
-	logcat.Good("读取插件完成，共加载了", len(pl.plugins), "个插件")
+	logcat.Good("> 插件加载完毕，已加载 ", count, " 个插件 <")
 }
