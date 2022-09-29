@@ -1,6 +1,6 @@
 .PHONY: build
 
-FILENAME=main
+FILENAME=Amigo-bot1.0
 
 all: build
 build:
