@@ -1,5 +1,5 @@
 bot:
-  debug: false
+  debug: false # 是否打印debug 信息
   ws:
     path: "/" # 连接路径，默认就好
     addr: "0.0.0.0:2333" # 正向websocket ip
