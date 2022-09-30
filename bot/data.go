@@ -165,13 +165,15 @@ const (
 	SendMsgApi    = "send_msg"
 	DeleteMsgApi  = "delete_msg"
 	GetImgApi     = "get_image"
+	GetBotInfo    = "get_login_info"
 	GroupKickApi  = "set_group_kick"
 	GroupBanApi   = "set_group_ban"
 	GroupCardApi  = "set_group_card"
 	GroupLeaveApi = "set_group_leave"
+	GruRequestApi = "set_group_add_request"
 
 	FriRequestApi      = "set_friend_add_request"
-	GruRequestApi      = "set_group_add_request"
+	FriDelApi          = "delete_friend"
 	GetStrangerInfoApi = "get_stranger_info"
 	CanSendImgApi      = "can_send_image"
 )
@@ -182,8 +184,19 @@ type SendRespondJson struct {
 	Echo   string      `json:"echo"`
 }
 
-var botLogo = `
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+type QQInfo struct {
+	UserId   int64  `json:"user_id"`
+	NickName string `json:"nickname"`
+}
+
+type MsgSend struct {
+	MessageType string `json:"message_type"`
+	UserId      int64  `json:"user_id"`
+	GroupId     int64  `json:"group_id"`
+	Message     string `json:"message"`
+}
+
+var botLogo = `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠊⠉⠀⠈⠙⢦⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣿⣀⠀⠀⠀⠀⠀⠀⠀⠀⡰⠋⡠⠖⠋⠉⠛⢷⣶⢷⡀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠀⠘⢿⣩⣧⠀⠀⠀⠀⠀⠀⡼⣡⠎⠀⠀⠀⠀⠀⠀⠹⣍⣧⠀⠀⠀⠀⠀⠀

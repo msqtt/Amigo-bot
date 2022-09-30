@@ -12,7 +12,8 @@ type botYaml struct {
 }
 
 type botConfig struct {
-	Ws struct {
+	Debug bool `yaml:"debug"`
+	Ws    struct {
 		Path string `yaml:"path"`
 		Addr string `yaml:"addr"`
 	} `yaml:"ws"`

@@ -34,37 +34,44 @@ func (ezres *Ezres) Init() {
 
 // 获取插件作用的消息类型
 func (ezres *Ezres) GetType() string {
-	return "request"
+	return bot.ReqPostType
 }
 
 // 实现插件的interface, Action() 放插件的主要功能
 func (ezres *Ezres) Action(b *bot.Bot, v interface{}) {
 	req, _ := v.(*bot.RecvRequest) // 记得断言为指针类型
-	ifAgree := false
+	isAgree := false
 	for _, root := range bot.DefaultBotConfig.Root {
 		if root == req.UserId {
-			ifAgree = true
+			isAgree = true
 			break
 		}
 	}
 	switch req.RequestType {
+
 	case bot.GruRequestType:
-		b.Send(bot.GruRequestApi, struct {
-			Flag    string `json:"flag"`
-			SubType string `json:"sub_type"`
-			Approve bool   `json:"approve"`
-			Reason  string `json:"reason"`
-		}{req.Flag, req.SubType, ifAgree, "我不跟陌生人走嗷"})
+		b.Send(
+			bot.GruRequestApi,
+			struct {
+				Flag    string `json:"flag"`
+				SubType string `json:"sub_type"`
+				Approve bool   `json:"approve"`
+				Reason  string `json:"reason"`
+			}{req.Flag, req.SubType, isAgree, "我不跟陌生人走嗷"})
+
 	case bot.FriRequestType:
-		b.Send(bot.FriRequestApi, struct {
-			Flag    string `json:"flag"`
-			Approve bool   `json:"approve"`
-		}{req.Flag, ifAgree})
+		b.Send(
+			bot.FriRequestApi,
+			struct {
+				Flag    string `json:"flag"`
+				Approve bool   `json:"approve"`
+			}{req.Flag, isAgree})
+
 	default:
 		logcat.Error("哈？未知的邀请格式...")
 		return
 	}
-	if ifAgree {
+	if isAgree {
 		logcat.Good("bot 已接受 [QQ: ", req.UserId, "] 的邀请: ", req.GroupId)
 	} else {
 		logcat.Good("bot 拒绝 [QQ: ", req.UserId, "] 的邀请: ", req.GroupId)

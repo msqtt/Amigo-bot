@@ -1,6 +1,7 @@
 bot:
+  debug: false
   ws:
     path: "/" # 连接路径，默认就好
     addr: "0.0.0.0:2333" # 正向websocket ip
   root: # 管理员qq，可以多个
-    - 10000000
+    - 1000000000
