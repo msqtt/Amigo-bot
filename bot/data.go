@@ -162,20 +162,25 @@ func (sd *Asender) String() string {
 const (
 	echo = "good"
 
-	SendMsgApi    = "send_msg"
-	DeleteMsgApi  = "delete_msg"
-	GetImgApi     = "get_image"
-	GetBotInfo    = "get_login_info"
+	MsgSendApi   = "send_msg"
+	MsgDeleteApi = "delete_msg"
+
+	GetImgApi          = "get_image"
+	GetBotInfo         = "get_login_info"
+	GetStrangerInfoApi = "get_stranger_info"
+
 	GroupKickApi  = "set_group_kick"
 	GroupBanApi   = "set_group_ban"
 	GroupCardApi  = "set_group_card"
 	GroupLeaveApi = "set_group_leave"
 	GruRequestApi = "set_group_add_request"
+	GruGetListApi = "get_group_list"
 
-	FriRequestApi      = "set_friend_add_request"
-	FriDelApi          = "delete_friend"
-	GetStrangerInfoApi = "get_stranger_info"
-	CanSendImgApi      = "can_send_image"
+	FriDelApi     = "delete_friend"
+	FriRequestApi = "set_friend_add_request"
+	FriGetListApi = "get_friend_list"
+
+	CanSendImgApi = "can_send_image"
 )
 
 type SendRespondJson struct {

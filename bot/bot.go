@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -13,15 +12,20 @@ import (
 )
 
 type Bot struct {
-	ws      *websocket.Conn
-	HasBoot bool
-	Info    QQInfo
+	ws       *websocket.Conn
+	getSign  chan string
+	sendChan chan interface{}
+	HasBoot  bool
+	Info     QQInfo
 }
 
 var upgrader = websocket.Upgrader{}
 
 func NewBot() *Bot {
-	return &Bot{}
+	bot := &Bot{}
+	bot.getSign = make(chan string)
+	bot.sendChan = make(chan interface{})
+	return bot
 }
 
 // 连接 websocket
@@ -107,19 +111,17 @@ func (bot *Bot) showlogo() {
 
 // 获取 bot 登录qq基本信息
 func (bot *Bot) getInfo() {
-	jsonBytes, err := bot.QuickTalk(GetBotInfo, &bot.Info)
-	if err != nil {
-		logcat.ErrorEnd("获取 bot 信息失败: ", err)
-	}
+	bot.Send(GetBotInfo, nil)
 
 	recv := struct {
 		Data QQInfo `json:"data"`
 	}{}
-	err = json.Unmarshal(jsonBytes, &recv)
+	err := bot.ws.ReadJSON(&recv)
 	if err != nil {
-		logcat.ErrorEnd("bot 信息json 解析失败: ", err)
+		logcat.ErrorEnd("获取 bot qq 信息失败: ", err)
 	}
 	bot.Info = recv.Data
+
 	logcat.Good(
 		"bot 登录成功！登录账户 [QQ: ",
 		bot.Info.UserId,

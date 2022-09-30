@@ -19,23 +19,31 @@ func (bot *Bot) receive() {
 	var reckind RecvKind
 	json.Unmarshal(bytes, &reckind)
 
-	switch reckind.PostType {
-	case MsgPostType:
-		msg := new(RecvMessage)
-		json.Unmarshal(bytes, msg)
-		bot.handleMessage(msg)
-	case ReqPostType:
-		req := new(RecvRequest)
-		json.Unmarshal(bytes, req)
-		bot.handleRequest(req)
-	case NtsPostType:
-		nts := new(RecvNotice)
-		json.Unmarshal(bytes, nts)
-		bot.handleNotise(nts)
-	case MtaPostType:
-		mta := new(RecvMeta)
-		json.Unmarshal(bytes, mta)
-		bot.handleMeta(mta)
+	select {
+	case str := <-bot.getSign:
+		if DefaultBotConfig.Debug {
+			logcat.Debug("QuickTalk: ", str)
+		}
+		bot.sendChan <- bytes
+	default:
+		switch reckind.PostType {
+		case MsgPostType:
+			msg := new(RecvMessage)
+			json.Unmarshal(bytes, msg)
+			bot.handleMessage(msg)
+		case ReqPostType:
+			req := new(RecvRequest)
+			json.Unmarshal(bytes, req)
+			bot.handleRequest(req)
+		case NtsPostType:
+			nts := new(RecvNotice)
+			json.Unmarshal(bytes, nts)
+			bot.handleNotise(nts)
+		case MtaPostType:
+			mta := new(RecvMeta)
+			json.Unmarshal(bytes, mta)
+			bot.handleMeta(mta)
+		}
 	}
 }
 
@@ -64,9 +72,8 @@ func (bot *Bot) QuickTalk(action string, v interface{}) ([]byte, error) {
 	if errSend != nil {
 		return nil, errSend
 	}
-	_, bytes, errRead := bot.ws.ReadMessage()
-	if errRead != nil {
-		return nil, errRead
-	}
+	bot.getSign <- action
+	bytes := (<-bot.sendChan).([]byte)
+
 	return bytes, nil
 }
