@@ -3,9 +3,10 @@ package bot
 import "github.com/mosqu1t0/Amigo-bot/utils/logcat"
 
 type BotPlugin interface {
+	GetType() string
 	Init()
 	Action(b *Bot, v interface{})
-	GetType() string
+	Destroy()
 }
 
 type pluginManager struct {
@@ -24,7 +25,7 @@ func (pm *pluginManager) AddPlugin(plugin BotPlugin) {
 	pm.plugins[postType] = append(pm.plugins[postType], plugin)
 }
 
-func (pm *pluginManager) finishInit() {
+func (pm *pluginManager) startInit() {
 	count := 0
 	for _, vp := range pm.plugins {
 		count += len(vp)
@@ -33,4 +34,12 @@ func (pm *pluginManager) finishInit() {
 		}
 	}
 	logcat.Good("> 插件加载完毕，已加载 ", count, " 个插件 <")
+}
+
+func (pm *pluginManager) startPluck() {
+	for _, vp := range pm.plugins {
+		for _, p := range vp {
+			p.Destroy()
+		}
+	}
 }

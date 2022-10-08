@@ -53,7 +53,7 @@ func (bot *Bot) Start() {
 	bot.ws = senWs
 	bot.HasBoot = true
 	logcat.Good("连接服务器，成功!")
-	bot.showlogo()
+	bot.showLogo()
 
 	if DefaultBotConfig.Debug {
 		logcat.Good("> Debug 模式开启, bot 将会打印原始 json <")
@@ -66,7 +66,7 @@ func (bot *Bot) Start() {
 
 	bot.getInfo()
 
-	PluginMgr.finishInit()
+	PluginMgr.startInit()
 }
 
 // bot 开始接收消息
@@ -87,21 +87,25 @@ func (bot *Bot) Work() {
 			}
 		}
 	}
-	logcat.Warn("bot 没事可干, 水饺去了~")
+	logcat.Info("bot 没事可干, 水饺去了~")
 }
 
 // 关闭websocket 连接
 func (bot *Bot) Close() {
-	err := bot.ws.WriteMessage(websocket.CloseMessage,
-		websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-	if err != nil {
-		logcat.ErrorEnd("无法发生关闭消息，即将强行关闭bot...")
+	if bot.HasBoot {
+		bot.HasBoot = false
+		PluginMgr.startPluck()
+		err := bot.ws.WriteMessage(websocket.CloseMessage,
+			websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+		if err != nil {
+			logcat.ErrorEnd("无法发生关闭消息，即将强行关闭bot...")
+		}
+		bot.ws.Close()
+		logcat.Good("bot 连接关闭成功!")
 	}
-	bot.ws.Close()
-	logcat.Good("bot 连接关闭成功!")
 }
 
-func (bot *Bot) showlogo() {
+func (bot *Bot) showLogo() {
 	splitLine := "----------------------------------------\n"
 	version := ">           Amigo bot v1.1             <\n"
 	fmt.Printf("\033[1;35m%s\033[0m\n",

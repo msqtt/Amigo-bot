@@ -77,3 +77,7 @@ func (ezres *Ezres) Action(b *bot.Bot, v interface{}) {
 		logcat.Good("bot 拒绝 [QQ: ", req.UserId, "] 的邀请: ", req.GroupId)
 	}
 }
+
+// 关闭 bot 前时执行的，销毁插件的方法
+func (ezres Ezres) Destroy() {
+}
